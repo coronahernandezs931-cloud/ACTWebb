@@ -5,36 +5,35 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
+@Entity 
 public class Category {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long category_id;
-    private String category_name;
-
-    public Category(Long category_id, String category_name) {
-        this.category_id = category_id;
-        this.category_name = category_name;
-    }
+      
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
 
     public Category() {
-
     }
 
-    public Long getCategory_id() {
-        return category_id;
+    public Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public void setCategory_id(Long category_id) {
-        this.category_id = category_id;
+    public Long getId() {
+        return id;
     }
 
-    public String getCategory_name() {
-        return category_name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setCategory_name(String category_name) {
-        this.category_name = category_name;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

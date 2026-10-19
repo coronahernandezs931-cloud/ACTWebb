@@ -5,10 +5,8 @@ public record ProductResponse(
     String name,
     Double price,
     int stock,
-
-    String categoryName,
-    Long categoryId
+    Long categoryId,
+    String categoryName
 ) {
 
-    
 }
