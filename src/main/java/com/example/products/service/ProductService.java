@@ -20,7 +20,11 @@ public class ProductService {
         this.repo = repo;
         this.repoCategory = repoCategory;
     }
-
+    public Product Save(Product product,Double porcent){
+        Double newPrice= product.getPrice()-((product.getPrice()/100)*porcent);
+        product.setPrice(newPrice);
+        return repo.save(product);
+    }
     public List<Product> findAll() {
         return repo.findAll();
     }
@@ -37,21 +41,24 @@ public class ProductService {
         return repo.save(product);
     }
 
-    public Optional<Product> update(Long id, Product newproduct, Long categoryId){
-        Product productBd = repo.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException("Product not found: with id" + id)
+     public Product update(Long id,Product newproduct,Long categoryId){
+        Product productBd=repo.findById(id).orElseThrow(
+                ()->
+                        new ResourceNotFoundException("Product not found: " +
+                                "with id"+ id)
         );
-
-        Category category2 = repoCategory.findById(categoryId).orElseThrow(
-            () -> new ResourceNotFoundException("Category not found whit id" + categoryId)
+        Category category2= repoCategory.findById(categoryId).orElseThrow(
+                ()->
+                        new ResourceNotFoundException("Category not found whit id" +
+                                
+categoryId
+                        )
         );
-
         productBd.setName(newproduct.getName());
         productBd.setPrice(newproduct.getPrice());
         productBd.setStock(newproduct.getStock());
         productBd.setCategory(category2);
-         
-        return Optional.of(repo.save(productBd));
+        return repo.save(productBd);
     }
 
     public boolean delete(Long id){

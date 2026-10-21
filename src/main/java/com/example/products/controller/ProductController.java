@@ -2,7 +2,10 @@ package com.example.products.controller;
 
 import com.example.products.dto.ProductRequest;
 import com.example.products.dto.ProductResponse;
+import com.example.products.exception.ResourceNotFoundException;
+import com.example.products.exception.StockExeption;
 import com.example.products.model.Product;
+import com.example.products.model.ProductoDTO;
 import com.example.products.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -11,13 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,11 +46,10 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
-        Optional<Product> product = service.findById(id);
-        if (product.isEmpty()) {
-            ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(toResponse(product.get()));
+        Product product = service.findById(id).orElseThrow(
+            ()-> new ResourceNotFoundException("No encontrado " +id)
+        );
+        return ResponseEntity.ok(toResponse(product));
     }
     
     @PostMapping
@@ -58,15 +60,12 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @Valid @RequestBody ProductRequest productUpdated) {
-        Optional<Product> product1 = service.update(
+        Product product1 = service.update(
             id,
             toEntity(productUpdated),
             productUpdated.categoryId()
         );
-        if (product1.isPresent()) {
-            return ResponseEntity.ok(toResponse(product1.get()));
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toResponse(product1));
     }
 
     @DeleteMapping("/{id}")
@@ -89,4 +88,23 @@ public class ProductController {
         productEntity.setStock(product.stock());
         return productEntity;
     }
+    private ProductRequest toRequest(Product product){
+        ProductRequest prodR=new  ProductRequest(product.getName(), product.getPrice(), product.getStock(),0L);
+        return prodR;
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductResponse> updatePrice(@PathVariable Long id,@Valid @RequestBody ProductoDTO porcent){
+        Product product = service.findById(id).orElseThrow(
+            ()-> new ResourceNotFoundException("No encontrado " +id)
+        );
+        if (product.getStock()>0) {
+            service.Save(product,porcent.getPorcentage());
+            return ResponseEntity.ok(toResponse(product));
+        }else{
+            throw new StockExeption("El producto no tiene stock");
+        }
+        
+    }
+
 }

@@ -17,4 +17,5 @@ public record ProductRequest(
     @NotNull
     Long categoryId
 ) {
+
 }
